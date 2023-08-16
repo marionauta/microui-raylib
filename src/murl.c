@@ -2,11 +2,8 @@
 #include <raylib.h>
 #include <stdlib.h>
 
-#include "../vendor/microui.h"
+#include "microui.h"
 #include "murl.h"
-
-#define RL_COLOR_FROM(c) ((Color){c.r, c.g, c.b, c.a})
-#define RL_RECTANGLE_FROM(r) ((Rectangle){r.x, r.y, r.w, r.h})
 
 int murl_text_width(mu_Font font, const char *str, int len) {
   (void)len;
@@ -22,11 +19,31 @@ int murl_text_height(mu_Font font) {
   return rlfont.baseSize;
 }
 
+struct murl_MouseButtonMap {
+  MouseButton rl;
+  int mu;
+};
+
+struct murl_MouseButtonMap murl_mouse_buttons[3] = {
+    {MOUSE_BUTTON_LEFT, MU_MOUSE_LEFT},
+    {MOUSE_BUTTON_RIGHT, MU_MOUSE_RIGHT},
+    {MOUSE_BUTTON_MIDDLE, MU_MOUSE_MIDDLE},
+};
+
 void murl_handle_input(mu_Context *ctx) {
-  Vector2 mouse_position = GetMousePosition();
-  mu_input_mousemove(ctx, (int)mouse_position.x, (int)mouse_position.y);
+  const int mouse_position_x = GetMouseX();
+  const int mouse_position_y = GetMouseY();
+  mu_input_mousemove(ctx, mouse_position_x, mouse_position_y);
   Vector2 mouse_wheel_scroll = GetMouseWheelMoveV();
   mu_input_scroll(ctx, (int)mouse_wheel_scroll.x, (int)mouse_wheel_scroll.y);
+  for (size_t index = 0; index < 3; index++) {
+    struct murl_MouseButtonMap button = murl_mouse_buttons[index];
+    if (IsMouseButtonPressed(button.rl)) {
+      mu_input_mousedown(ctx, mouse_position_x, mouse_position_y, button.mu);
+    } else if (IsMouseButtonReleased(button.rl)) {
+      mu_input_mouseup(ctx, mouse_position_x, mouse_position_y, button.mu);
+    }
+  }
 }
 
 void murl_render(mu_Context *ctx) {
@@ -40,14 +57,14 @@ void murl_render(mu_Context *ctx) {
     switch (cmd->type) {
     case MU_COMMAND_TEXT: {
       int font_size = ctx->text_height(NULL);
-      Color text_color = RL_COLOR_FROM(cmd->text.color);
+      Color text_color = RL_COLOR_FROM_MU(cmd->text.color);
       DrawText(cmd->text.str, cmd->text.pos.x, cmd->text.pos.y, font_size,
                text_color);
     } break;
 
     case MU_COMMAND_RECT: {
-      Rectangle rect = RL_RECTANGLE_FROM(cmd->rect.rect);
-      Color rect_color = RL_COLOR_FROM(cmd->rect.color);
+      Rectangle rect = RL_RECTANGLE_FROM_MU(cmd->rect.rect);
+      Color rect_color = RL_COLOR_FROM_MU(cmd->rect.color);
       DrawRectangleRec(rect, rect_color);
     } break;
 
@@ -56,12 +73,13 @@ void murl_render(mu_Context *ctx) {
 
     case MU_COMMAND_CLIP: {
       EndScissorMode();
-      BeginScissorMode(cmd->clip.rect.x, cmd->clip.rect.y, cmd->clip.rect.w, cmd->clip.rect.h);
+      BeginScissorMode(cmd->clip.rect.x, cmd->clip.rect.y, cmd->clip.rect.w,
+                       cmd->clip.rect.h);
     } break;
 
     case MU_COMMAND_JUMP:
       break;
-      
+
     default:
       assert(0 && "not implemented");
       break;
