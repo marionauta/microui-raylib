@@ -1,0 +1,6 @@
+CompileFlags:
+  Add:
+    - "-I./vendor"
+    - "-I./../vendor"
+    - "-I./src"
+    - "-I./../src"
