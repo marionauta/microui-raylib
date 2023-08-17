@@ -24,20 +24,24 @@ struct murl_MouseButtonMap {
   int mu;
 };
 
-struct murl_MouseButtonMap murl_mouse_buttons[3] = {
+static struct murl_MouseButtonMap murl__mouse_buttons[] = {
     {MOUSE_BUTTON_LEFT, MU_MOUSE_LEFT},
     {MOUSE_BUTTON_RIGHT, MU_MOUSE_RIGHT},
     {MOUSE_BUTTON_MIDDLE, MU_MOUSE_MIDDLE},
+    {-1, -1},
 };
 
 void murl_handle_input(mu_Context *ctx) {
   const int mouse_position_x = GetMouseX();
   const int mouse_position_y = GetMouseY();
   mu_input_mousemove(ctx, mouse_position_x, mouse_position_y);
-  Vector2 mouse_wheel_scroll = GetMouseWheelMoveV();
+  const Vector2 mouse_wheel_scroll = GetMouseWheelMoveV();
   mu_input_scroll(ctx, (int)mouse_wheel_scroll.x, (int)mouse_wheel_scroll.y);
-  for (size_t index = 0; index < 3; index++) {
-    struct murl_MouseButtonMap button = murl_mouse_buttons[index];
+  for (size_t index = 0;; index++) {
+    struct murl_MouseButtonMap button = murl__mouse_buttons[index];
+    if (button.rl == -1U) {
+      break;
+    }
     if (IsMouseButtonPressed(button.rl)) {
       mu_input_mousedown(ctx, mouse_position_x, mouse_position_y, button.mu);
     } else if (IsMouseButtonReleased(button.rl)) {
@@ -46,9 +50,9 @@ void murl_handle_input(mu_Context *ctx) {
   }
 }
 
-void murl_render(mu_Context *ctx) {
+void murl_render_ex(mu_Context *ctx, Color background_color) {
   BeginDrawing();
-  ClearBackground(BLACK);
+  ClearBackground(background_color);
 
   BeginScissorMode(0, 0, GetScreenWidth(), GetScreenHeight());
 
@@ -68,8 +72,9 @@ void murl_render(mu_Context *ctx) {
       DrawRectangleRec(rect, rect_color);
     } break;
 
-    case MU_COMMAND_ICON:
-      break;
+    case MU_COMMAND_ICON: {
+      assert(0 && "not implemented");
+    } break;
 
     case MU_COMMAND_CLIP: {
       EndScissorMode();
@@ -77,11 +82,8 @@ void murl_render(mu_Context *ctx) {
                        cmd->clip.rect.h);
     } break;
 
-    case MU_COMMAND_JUMP:
-      break;
-
     default:
-      assert(0 && "not implemented");
+      assert(0 && "unreachable");
       break;
     }
   }

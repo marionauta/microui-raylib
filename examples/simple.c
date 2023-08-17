@@ -1,6 +1,5 @@
 #include <raylib.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 #include "microui.h"
@@ -25,8 +24,14 @@ int main(void) {
       mu_label(ctx, "Hello, raylib");
 
       if (mu_button(ctx, "The button")) {
-        printf("Hello button\n");
+        mu_open_popup(ctx, "popup");
       }
+
+      if (mu_begin_popup(ctx, "popup")) {
+        mu_label(ctx, "This is a popup");
+        mu_end_popup(ctx);
+      }
+
       mu_end_window(ctx);
     }
 
