@@ -105,9 +105,25 @@ void murl_render_ex(mu_Context *ctx, Color background_color) {
     } break;
 
     case MU_COMMAND_ICON: {
-      // TODO: handle icons correctly
       Color icon_color = RL_COLOR_FROM_MU(cmd->icon.color);
-      DrawText("#", cmd->icon.rect.x, cmd->icon.rect.y, cmd->icon.rect.h,
+      char *icon = "?";
+      switch (cmd->icon.id) {
+      case MU_ICON_CLOSE: {
+        icon = "x";
+      } break;
+      case MU_ICON_CHECK: {
+        icon = "*";
+      } break;
+      case MU_ICON_COLLAPSED: {
+        icon = "^";
+      } break;
+      case MU_ICON_EXPANDED: {
+        icon = "v";
+      } break;
+      default:
+        assert(0 && "unreachable");
+      }
+      DrawText(icon, cmd->icon.rect.x, cmd->icon.rect.y, cmd->icon.rect.h,
                icon_color);
     } break;
 
