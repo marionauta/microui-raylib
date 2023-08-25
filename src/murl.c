@@ -5,39 +5,22 @@
 #include "microui.h"
 #include "murl.h"
 
-void murl_setup_font(mu_Context *ctx) {
+void murl_setup_font_ex(mu_Context *ctx, const Font *font) {
+  ctx->style->font = (mu_Font)font;
   ctx->text_width = murl_text_width;
   ctx->text_height = murl_text_height;
   ctx->style->spacing = MURL_TEXT_SPACING;
 }
 
-Font murl_get_font(const mu_Context *ctx) {
-  if (ctx->style->font == NULL) {
-    return GetFontDefault();
-  } else {
-    assert(0 && "unimplemented");
-  }
-}
-
 int murl_text_width(mu_Font font, const char *str, int len) {
   (void)len;
-  Font rlfont;
-  if (font == NULL) {
-    rlfont = GetFontDefault();
-  } else {
-    assert(0 && "unimplemented");
-  }
+  Font rlfont = RL_FONT_FROM_MU(font);
   Vector2 size = MeasureTextEx(rlfont, str, rlfont.baseSize, MURL_TEXT_SPACING);
   return size.x;
 }
 
 int murl_text_height(mu_Font font) {
-  Font rlfont;
-  if (font == NULL) {
-    rlfont = GetFontDefault();
-  } else {
-    assert(0 && "unimplemented");
-  }
+  Font rlfont = RL_FONT_FROM_MU(font);
   return rlfont.baseSize;
 }
 
@@ -128,9 +111,9 @@ void murl_render_ex(mu_Context *ctx, Color background_color) {
   while (mu_next_command(ctx, &cmd)) {
     switch (cmd->type) {
     case MU_COMMAND_TEXT: {
-      Font font = murl_get_font(ctx);
+      Font font = RL_FONT_FROM_MU(cmd->text.font);
       Vector2 text_position = RL_VECTOR2_FROM_MU(cmd->text.pos);
-      int font_size = ctx->text_height(NULL);
+      int font_size = ctx->text_height(&font);
       Color text_color = RL_COLOR_FROM_MU(cmd->text.color);
       DrawTextEx(font, cmd->text.str, text_position, font_size,
                  ctx->style->spacing, text_color);
