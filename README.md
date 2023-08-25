@@ -4,8 +4,10 @@
 
 ## features
 
+- Tiny: under 200 sloc of C99.
 - Handle mouse & keyboard inputs.
-- Draw on screen.
+- Handle custom fonts.
+- Draw controls on screen.
 
 ## examples
 
