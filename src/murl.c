@@ -5,17 +5,39 @@
 #include "microui.h"
 #include "murl.h"
 
+void murl_setup_font(mu_Context *ctx) {
+  ctx->text_width = murl_text_width;
+  ctx->text_height = murl_text_height;
+  ctx->style->spacing = MURL_TEXT_SPACING;
+}
+
+Font murl_get_font(const mu_Context *ctx) {
+  if (ctx->style->font == NULL) {
+    return GetFontDefault();
+  } else {
+    assert(0 && "unimplemented");
+  }
+}
+
 int murl_text_width(mu_Font font, const char *str, int len) {
   (void)len;
-  (void)font;
-  Font rlfont = GetFontDefault();
-  Vector2 size = MeasureTextEx(rlfont, str, rlfont.baseSize, 0);
+  Font rlfont;
+  if (font == NULL) {
+    rlfont = GetFontDefault();
+  } else {
+    assert(0 && "unimplemented");
+  }
+  Vector2 size = MeasureTextEx(rlfont, str, rlfont.baseSize, MURL_TEXT_SPACING);
   return size.x;
 }
 
 int murl_text_height(mu_Font font) {
-  (void)font;
-  Font rlfont = GetFontDefault();
+  Font rlfont;
+  if (font == NULL) {
+    rlfont = GetFontDefault();
+  } else {
+    assert(0 && "unimplemented");
+  }
   return rlfont.baseSize;
 }
 
@@ -72,14 +94,28 @@ static void murl__handle_keyboard_keys(mu_Context *ctx) {
   }
 }
 
+static void murl__handle_text_input(mu_Context *ctx) {
+  char buffer[512];
+  for (size_t index = 0; index < 512; index++) {
+    char c = GetCharPressed();
+    buffer[index] = c;
+    if (c == '\0') {
+      break;
+    }
+  }
+  mu_input_text(ctx, buffer);
+}
+
 void murl_handle_input(mu_Context *ctx) {
   const int mouse_position_x = GetMouseX();
   const int mouse_position_y = GetMouseY();
   mu_input_mousemove(ctx, mouse_position_x, mouse_position_y);
   const Vector2 mouse_wheel_scroll = GetMouseWheelMoveV();
-  mu_input_scroll(ctx, (int)mouse_wheel_scroll.x, (int)mouse_wheel_scroll.y);
+  mu_input_scroll(ctx, (int)mouse_wheel_scroll.x * -30,
+                  (int)mouse_wheel_scroll.y * -30);
   murl__handle_mouse_buttons(ctx, mouse_position_x, mouse_position_y);
   murl__handle_keyboard_keys(ctx);
+  murl__handle_text_input(ctx);
 }
 
 void murl_render_ex(mu_Context *ctx, Color background_color) {
@@ -92,10 +128,12 @@ void murl_render_ex(mu_Context *ctx, Color background_color) {
   while (mu_next_command(ctx, &cmd)) {
     switch (cmd->type) {
     case MU_COMMAND_TEXT: {
+      Font font = murl_get_font(ctx);
+      Vector2 text_position = RL_VECTOR2_FROM_MU(cmd->text.pos);
       int font_size = ctx->text_height(NULL);
       Color text_color = RL_COLOR_FROM_MU(cmd->text.color);
-      DrawText(cmd->text.str, cmd->text.pos.x, cmd->text.pos.y, font_size,
-               text_color);
+      DrawTextEx(font, cmd->text.str, text_position, font_size,
+                 ctx->style->spacing, text_color);
     } break;
 
     case MU_COMMAND_RECT: {

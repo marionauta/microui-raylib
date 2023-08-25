@@ -1,5 +1,4 @@
 #include <raylib.h>
-#include <stdbool.h>
 #include <stdlib.h>
 
 #include "microui.h"
@@ -10,31 +9,20 @@ int main(void) {
   mu_init(ctx);
   murl_setup_font(ctx);
 
-  InitWindow(800, 600, "microui + raylib");
+  InitWindow(800, 600, "");
   SetTargetFPS(60);
+
+  char textbox_buffer[512] = {0};
 
   while (!WindowShouldClose()) {
     murl_handle_input(ctx);
-
     mu_begin(ctx);
-
-    if (mu_begin_window(ctx, "Hello", mu_rect(20, 20, 200, 150))) {
-      mu_label(ctx, "Hello, raylib");
-
-      if (mu_button(ctx, "The button")) {
-        mu_open_popup(ctx, "popup");
-      }
-
-      if (mu_begin_popup(ctx, "popup")) {
-        mu_label(ctx, "This is a popup");
-        mu_end_popup(ctx);
-      }
-
+    if (mu_begin_window(ctx, "font", mu_rect(10, 10, 400, 300))) {
+      mu_label(ctx, "Hello, World");
+      mu_textbox(ctx, textbox_buffer, 512);
       mu_end_window(ctx);
     }
-
     mu_end(ctx);
-
     murl_render(ctx);
   }
 
