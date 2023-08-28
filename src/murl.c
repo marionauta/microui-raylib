@@ -24,6 +24,12 @@ int murl_text_height(mu_Font font) {
   return rlfont.baseSize;
 }
 
+void murl_handle_mouse_scroll(mu_Context *ctx) {
+  const Vector2 mouse_wheel_scroll = GetMouseWheelMoveV();
+  mu_input_scroll(ctx, (int)mouse_wheel_scroll.x * -30,
+                  (int)mouse_wheel_scroll.y * -30);
+}
+
 struct murl__MouseButtonMap {
   MouseButton rl;
   int mu;
@@ -36,7 +42,7 @@ static struct murl__MouseButtonMap murl__mouse_buttons[] = {
     {-1, -1},
 };
 
-static void murl__handle_mouse_buttons(mu_Context *ctx, int x, int y) {
+void murl_handle_mouse_buttons_input_ex(mu_Context *ctx, int x, int y) {
   for (size_t index = 0;; index++) {
     struct murl__MouseButtonMap button = murl__mouse_buttons[index];
     if (button.rl == -1U) {
@@ -63,7 +69,7 @@ static struct murl__KeyboardKeyMap murl__keyboard_keys[] = {
     {KEY_BACKSPACE, MU_KEY_BACKSPACE}, {-1, -1},
 };
 
-static void murl__handle_keyboard_keys(mu_Context *ctx) {
+void murl_handle_keyboard_input(mu_Context *ctx) {
   for (size_t index = 0;; index++) {
     struct murl__KeyboardKeyMap key = murl__keyboard_keys[index];
     if (key.rl == -1U) {
@@ -77,7 +83,7 @@ static void murl__handle_keyboard_keys(mu_Context *ctx) {
   }
 }
 
-static void murl__handle_text_input(mu_Context *ctx) {
+void murl_handle_text_input(mu_Context *ctx) {
   char buffer[512];
   for (size_t index = 0; index < 512; index++) {
     char c = GetCharPressed();
@@ -93,12 +99,10 @@ void murl_handle_input(mu_Context *ctx) {
   const int mouse_position_x = GetMouseX();
   const int mouse_position_y = GetMouseY();
   mu_input_mousemove(ctx, mouse_position_x, mouse_position_y);
-  const Vector2 mouse_wheel_scroll = GetMouseWheelMoveV();
-  mu_input_scroll(ctx, (int)mouse_wheel_scroll.x * -30,
-                  (int)mouse_wheel_scroll.y * -30);
-  murl__handle_mouse_buttons(ctx, mouse_position_x, mouse_position_y);
-  murl__handle_keyboard_keys(ctx);
-  murl__handle_text_input(ctx);
+  murl_handle_mouse_scroll(ctx);
+  murl_handle_mouse_buttons_input_ex(ctx, mouse_position_x, mouse_position_y);
+  murl_handle_keyboard_input(ctx);
+  murl_handle_text_input(ctx);
 }
 
 void murl_render_ex(mu_Context *ctx, Color background_color) {
@@ -136,10 +140,10 @@ void murl_render_ex(mu_Context *ctx, Color background_color) {
         icon = "*";
       } break;
       case MU_ICON_COLLAPSED: {
-        icon = "^";
+        icon = "+";
       } break;
       case MU_ICON_EXPANDED: {
-        icon = "v";
+        icon = "-";
       } break;
       default:
         assert(0 && "unreachable");

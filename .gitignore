@@ -1,4 +1,5 @@
 fonts/
 vendor/
-examples/simple
-examples/font
+examples/*
+!examples/*.c
+*.o
