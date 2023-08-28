@@ -39,7 +39,7 @@ void murl_handle_keyboard_input(mu_Context *ctx);
 // Handle text input.
 void murl_handle_text_input(mu_Context *ctx);
 
-#define murl_render(ctx) murl_render_ex(ctx, BLACK)
-void murl_render_ex(mu_Context *ctx, Color background_color);
+// Draw controls, text & icons using raylib.
+void murl_render(mu_Context *ctx);
 
 #endif // MURL_H

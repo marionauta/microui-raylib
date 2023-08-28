@@ -6,12 +6,12 @@
 #include "murl.h"
 
 int main(void) {
+  InitWindow(800, 600, "microui + raylib");
+  SetTargetFPS(60);
+
   mu_Context *ctx = malloc(sizeof(mu_Context));
   mu_init(ctx);
   murl_setup_font(ctx);
-
-  InitWindow(800, 600, "microui + raylib");
-  SetTargetFPS(60);
 
   while (!WindowShouldClose()) {
     murl_handle_input(ctx);
@@ -35,10 +35,13 @@ int main(void) {
 
     mu_end(ctx);
 
+    BeginDrawing();
+    ClearBackground(BLACK);
     murl_render(ctx);
+    EndDrawing();
   }
 
-  CloseWindow();
   free(ctx);
+  CloseWindow();
   return 0;
 }

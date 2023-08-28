@@ -105,10 +105,7 @@ void murl_handle_input(mu_Context *ctx) {
   murl_handle_text_input(ctx);
 }
 
-void murl_render_ex(mu_Context *ctx, Color background_color) {
-  BeginDrawing();
-  ClearBackground(background_color);
-
+void murl_render(mu_Context *ctx) {
   BeginScissorMode(0, 0, GetScreenWidth(), GetScreenHeight());
 
   mu_Command *cmd = NULL;
@@ -165,5 +162,4 @@ void murl_render_ex(mu_Context *ctx, Color background_color) {
   }
 
   EndScissorMode();
-  EndDrawing();
 }

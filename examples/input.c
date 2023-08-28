@@ -25,7 +25,11 @@ int main(void) {
       mu_end_window(ctx);
     }
     mu_end(ctx);
+
+    BeginDrawing();
+    ClearBackground(BLACK);
     murl_render(ctx);
+    EndDrawing();
   }
 
   free(ctx);
