@@ -4,3 +4,4 @@ CompileFlags:
     - "-I./../vendor"
     - "-I./src"
     - "-I./../src"
+    - "-I/opt/homebrew/Cellar/raylib/4.5.0/include"
