@@ -13,6 +13,10 @@
 
 There are some code examples in the [`examples`](examples) folder.
 
+> [!NOTE]
+> To compile the examples with the given `Makefile`, make sure you have the
+> `microui.c` file in the `vendor` folder. Then simply run `make`.
+
 All available functions are listed in [`src/murl.h`](src/murl.h).
 
 ## contributing
