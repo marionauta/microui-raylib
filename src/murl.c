@@ -14,13 +14,13 @@ void murl_setup_font_ex(mu_Context *ctx, const Font *font) {
 
 int murl_text_width(mu_Font font, const char *str, int len) {
   (void)len;
-  Font rlfont = RL_FONT_FROM_MU(font);
+  Font rlfont = MURL_FONT_FROM_MU(font);
   Vector2 size = MeasureTextEx(rlfont, str, rlfont.baseSize, MURL_TEXT_SPACING);
   return size.x;
 }
 
 int murl_text_height(mu_Font font) {
-  Font rlfont = RL_FONT_FROM_MU(font);
+  Font rlfont = MURL_FONT_FROM_MU(font);
   return rlfont.baseSize;
 }
 
@@ -112,22 +112,22 @@ void murl_render(mu_Context *ctx) {
   while (mu_next_command(ctx, &cmd)) {
     switch (cmd->type) {
     case MU_COMMAND_TEXT: {
-      Font font = RL_FONT_FROM_MU(cmd->text.font);
-      Vector2 text_position = RL_VECTOR2_FROM_MU(cmd->text.pos);
+      Font font = MURL_FONT_FROM_MU(cmd->text.font);
+      Vector2 text_position = MURL_VECTOR2_FROM_MU(cmd->text.pos);
       int font_size = ctx->text_height(&font);
-      Color text_color = RL_COLOR_FROM_MU(cmd->text.color);
+      Color text_color = MURL_COLOR_FROM_MU(cmd->text.color);
       DrawTextEx(font, cmd->text.str, text_position, font_size,
                  ctx->style->spacing, text_color);
     } break;
 
     case MU_COMMAND_RECT: {
-      Rectangle rect = RL_RECTANGLE_FROM_MU(cmd->rect.rect);
-      Color rect_color = RL_COLOR_FROM_MU(cmd->rect.color);
+      Rectangle rect = MURL_RECTANGLE_FROM_MU(cmd->rect.rect);
+      Color rect_color = MURL_COLOR_FROM_MU(cmd->rect.color);
       DrawRectangleRec(rect, rect_color);
     } break;
 
     case MU_COMMAND_ICON: {
-      Color icon_color = RL_COLOR_FROM_MU(cmd->icon.color);
+      Color icon_color = MURL_COLOR_FROM_MU(cmd->icon.color);
       char *icon = "?";
       switch (cmd->icon.id) {
       case MU_ICON_CLOSE: {
