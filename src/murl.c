@@ -6,6 +6,7 @@
 #include "murl.h"
 
 #define array_count(array) (sizeof(array)/sizeof(array[0]))
+#define END_CLIP_SIZE (0x1000000)
 
 void murl_setup_font_ex(mu_Context *ctx, const Font *font) {
   ctx->style->font = (mu_Font)font;
@@ -103,8 +104,6 @@ void murl_handle_input(mu_Context *ctx) {
 }
 
 void murl_render(mu_Context *ctx) {
-  BeginScissorMode(0, 0, GetScreenWidth(), GetScreenHeight());
-
   mu_Command *cmd = NULL;
   while (mu_next_command(ctx, &cmd)) {
     switch (cmd->type) {
@@ -147,9 +146,12 @@ void murl_render(mu_Context *ctx) {
     } break;
 
     case MU_COMMAND_CLIP: {
-      EndScissorMode();
-      BeginScissorMode(cmd->clip.rect.x, cmd->clip.rect.y, cmd->clip.rect.w,
-                       cmd->clip.rect.h);
+      mu_Rect r = cmd->clip.rect;
+      if (r.x == 0 && r.y == 0 && r.w == END_CLIP_SIZE && r.h == END_CLIP_SIZE) {
+        EndScissorMode();
+      } else {
+        BeginScissorMode(r.x, r.y, r.w, r.h);
+      }
     } break;
 
     default:
@@ -157,6 +159,4 @@ void murl_render(mu_Context *ctx) {
       break;
     }
   }
-
-  EndScissorMode();
 }
