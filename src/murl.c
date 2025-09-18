@@ -5,6 +5,8 @@
 #include "microui.h"
 #include "murl.h"
 
+#define array_count(array) (sizeof(array)/sizeof(array[0]))
+
 void murl_setup_font_ex(mu_Context *ctx, const Font *font) {
   ctx->style->font = (mu_Font)font;
   ctx->text_width = murl_text_width;
@@ -39,15 +41,12 @@ static struct murl__MouseButtonMap murl__mouse_buttons[] = {
     {MOUSE_BUTTON_LEFT, MU_MOUSE_LEFT},
     {MOUSE_BUTTON_RIGHT, MU_MOUSE_RIGHT},
     {MOUSE_BUTTON_MIDDLE, MU_MOUSE_MIDDLE},
-    {-1, -1},
 };
 
 void murl_handle_mouse_buttons_input_ex(mu_Context *ctx, int x, int y) {
-  for (size_t index = 0;; index++) {
+  size_t buttons_count = array_count(murl__mouse_buttons);
+  for (size_t index = 0; index < buttons_count; index++) {
     struct murl__MouseButtonMap button = murl__mouse_buttons[index];
-    if (button.rl == -1U) {
-      break;
-    }
     if (IsMouseButtonPressed(button.rl)) {
       mu_input_mousedown(ctx, x, y, button.mu);
     } else if (IsMouseButtonReleased(button.rl)) {
@@ -66,15 +65,13 @@ static struct murl__KeyboardKeyMap murl__keyboard_keys[] = {
     {KEY_LEFT_CONTROL, MU_KEY_CTRL},   {KEY_RIGHT_CONTROL, MU_KEY_CTRL},
     {KEY_LEFT_ALT, MU_KEY_ALT},        {KEY_RIGHT_ALT, MU_KEY_ALT},
     {KEY_ENTER, MU_KEY_RETURN},        {KEY_KP_ENTER, MU_KEY_RETURN},
-    {KEY_BACKSPACE, MU_KEY_BACKSPACE}, {-1, -1},
+    {KEY_BACKSPACE, MU_KEY_BACKSPACE},
 };
 
 void murl_handle_keyboard_input(mu_Context *ctx) {
-  for (size_t index = 0;; index++) {
+  size_t keys_count = array_count(murl__keyboard_keys);
+  for (size_t index = 0; index < keys_count; index++) {
     struct murl__KeyboardKeyMap key = murl__keyboard_keys[index];
-    if (key.rl == -1U) {
-      break;
-    }
     if (IsKeyPressed(key.rl) || IsKeyPressedRepeat(key.rl)) {
       mu_input_keydown(ctx, key.mu);
     } else if (IsKeyReleased(key.rl)) {
