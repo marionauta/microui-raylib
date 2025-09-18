@@ -75,7 +75,7 @@ void murl_handle_keyboard_input(mu_Context *ctx) {
     if (key.rl == -1U) {
       break;
     }
-    if (IsKeyPressed(key.rl)) {
+    if (IsKeyPressed(key.rl) || IsKeyPressedRepeat(key.rl)) {
       mu_input_keydown(ctx, key.mu);
     } else if (IsKeyReleased(key.rl)) {
       mu_input_keyup(ctx, key.mu);
