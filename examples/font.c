@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "microui.h"
+#define MURL_IMPLEMENTATION
 #include "murl.h"
 
 int main(void) {
